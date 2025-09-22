@@ -7,6 +7,7 @@ import reactX from 'eslint-plugin-react-x'
 import reactDom from 'eslint-plugin-react-dom'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
+import tanstackQuery from '@tanstack/eslint-plugin-query'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
@@ -15,17 +16,23 @@ export default defineConfig([
         files: ['**/*.{ts,tsx}'],
         extends: [
             js.configs.recommended,
-            // Strictest type-aware rules
             tseslint.configs.strictTypeChecked,
-            // Stylistic rules for consistency
             tseslint.configs.stylisticTypeChecked,
-            // React-specific strict rules
             reactX.configs['recommended-typescript'],
             reactDom.configs.recommended,
-            // React hooks and Vite HMR
             reactHooks.configs['recommended-latest'],
             reactRefresh.configs.vite,
         ],
+        plugins: {
+            '@tanstack/query': tanstackQuery,
+        },
+        rules: {
+            ...tanstackQuery.configs.recommended.rules,
+            // You can add or override specific rules here:
+            // '@tanstack/query/exhaustive-deps': 'error',
+            // '@tanstack/query/no-rest-destructuring': 'warn',
+            // '@tanstack/query/stable-query-client': 'error',
+        },
         languageOptions: {
             ecmaVersion: 2020,
             globals: globals.browser,
@@ -33,9 +40,6 @@ export default defineConfig([
                 project: ['./tsconfig.node.json', './tsconfig.app.json'],
                 tsconfigRootDir: import.meta.dirname,
             },
-        },
-        rules: {
-            // Custom Rules
         },
     },
 ])
