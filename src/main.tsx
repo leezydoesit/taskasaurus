@@ -2,6 +2,7 @@ import './index.css'
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App'
+import {QueryProvider} from "@/providers/QueryProvider";
 
 const rootElement = document.getElementById('root')
 if (!rootElement) {
@@ -10,6 +11,8 @@ if (!rootElement) {
 
 createRoot(rootElement).render(
     <React.StrictMode>
-        <App />
+        <QueryProvider>
+            <App />
+        </QueryProvider>
     </React.StrictMode>
 )
