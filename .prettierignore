@@ -1,0 +1,27 @@
+# Node + build
+node_modules
+dist
+build
+
+coverage
+
+# Vite cache
+.vite
+.vite-inspect
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.*.local
+
+# Package manager lockfiles (optional if you don’t want formatting)
+pnpm-lock.yaml
+yarn.lock
+package-lock.json
+
+# Config files (let ESLint handle them instead)
+vite.config.*
+eslint.config.*
+commitlint.config.*
