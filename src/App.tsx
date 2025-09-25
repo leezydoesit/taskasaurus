@@ -1,73 +1,40 @@
-import './App.css';
-import { useQuery } from '@tanstack/react-query';
-import { getTodoList, Todo } from '@/api/todo';
+import { AppHeader } from '@/components/layout/AppHeader';
+import { AppShell } from '@/components/layout/AppShell';
+import { EmptyState } from '@/components/feedback/EmptyState';
+import { ErrorState } from '@/components/feedback/ErrorState';
+import { LoadingState } from '@/components/feedback/LoadingState';
+import { TodoList } from '@/features/todos/components/TodoList';
+import { useTodos } from '@/features/todos/hooks/useTodos';
+import { getErrorMessage } from '@/utils/error';
 
 export default function App() {
-  const { data, isLoading, isError, error } = useQuery({
-    queryKey: ['todos'],
-    queryFn: getTodoList,
-  });
+  const { todos, isPending, isError, error } = useTodos();
 
-  if (isLoading) return <p className="p-6">Loading…</p>;
+  const content = () => {
+    if (isPending) {
+      return <LoadingState message="Fetching tasks…" />;
+    }
 
-  if (isError) {
-    const message = error.cause
-      ? 'Data validation failed (Zod).'
-      : error.message;
-    return (
-      <div className="p-6">
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4">
-          <p className="font-medium text-red-700">Error</p>
-          <p className="text-sm text-red-700/90">{message}</p>
-          {'issues' in error && (
-            <details className="mt-2 text-xs text-red-700/80">
-              <summary>Details</summary>
-              <pre className="whitespace-pre-wrap">
-                {JSON.stringify(error.issues, null, 2)}
-              </pre>
-            </details>
-          )}
-        </div>
-      </div>
-    );
-  }
+    if (isError) {
+      return (
+        <ErrorState
+          title="Unable to load todos"
+          description={getErrorMessage(error)}
+        />
+      );
+    }
+
+    if (todos.length === 0) {
+      return <EmptyState message="Nothing to show yet." />;
+    }
+
+    return <TodoList todos={todos} />;
+  };
 
   return (
-    <div className="p-6">
-      <h1 className="mb-6 text-2xl font-bold text-gray-800">Todos</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {data?.slice(0, 16).map((todo: Todo) => (
-          <article
-            key={todo.id}
-            className="rounded-xl border bg-white shadow-sm p-4 flex flex-col justify-between"
-          >
-            <header className="mb-3">
-              <h3 className="font-semibold text-gray-800 mb-1 line-clamp-2">
-                {todo.title}
-              </h3>
-              <p className="text-xs text-gray-500">ID: {todo.id}</p>
-            </header>
-
-            <footer className="flex items-center justify-between">
-              <span
-                className={`px-2 py-1 rounded-full text-xs font-medium ${
-                  todo.completed
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-yellow-100 text-yellow-700'
-                }`}
-              >
-                {todo.completed ? 'Done' : 'Pending'}
-              </span>
-              <button
-                type="button"
-                className="text-xs underline decoration-dotted"
-              >
-                Details
-              </button>
-            </footer>
-          </article>
-        ))}
-      </div>
-    </div>
+    <AppShell>
+      <AppHeader />
+      {content()}
+    </AppShell>
   );
 }
